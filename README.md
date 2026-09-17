@@ -339,6 +339,80 @@ Ringkasan paket yang lolos filter adalah sebagai berikut:
 
 file capture: [`mika-capture-icmp-dns.pcapng`](assets/mika-capture.pcapng).
 
+7. Chisa memutuskan mendirikan FTP Server pada node miliknya dengan shared folder di /var/wired/data. Terapkan kebijakan akses: user alice (hak akses read & write), user mika (dibatasi read-only), dan user eiri (dibatasi tanpa izin akses / blacklist). Buktikan konfigurasi dengan membuat file signal_alice.txt dari user alice, dan buktikan penolakan akses saat user eiri mencoba login.
+
+Pertama dilakukan instalasi FTP server pada Chisa menggunakan `vsftpd`. Kemudian dibuat direktori `/var/wired/data` sebagai shared folder dan akun yang diperlukan untuk pengujian.
+
+```bash
+apk update
+apk add vsftpd
+
+id alice >/dev/null 2>&1 || adduser -D alice
+echo "alice:alice123" | chpasswd
+
+id mika >/dev/null 2>&1 || adduser -D mika
+echo "mika:mika123" | chpasswd
+
+id eiri >/dev/null 2>&1 || adduser -D eiri
+echo "eiri:eiri123" | chpasswd
+
+mkdir -p /var/wired/data
+
+chown alice:alice /var/wired/data
+chmod 755 /var/wired/data
+```
+
+Selanjutnya dilakukan pengaturan layanan FTP beserta kebijakan akses setiap user. Akun alice diberi hak baca dan tulis, mika hanya diberi hak baca, sedangkan eiri dimasukkan ke blacklist agar login ditolak.
+
+```text
+<!-- /etc/vsftpd.conf -->
+listen=YES
+listen_address=0.0.0.0
+anonymous_enable=NO
+local_enable=YES
+write_enable=YES
+local_root=/var/wired/data
+chroot_local_user=YES
+allow_writeable_chroot=YES
+user_config_dir=/etc/vsftpd/users
+userlist_enable=YES
+userlist_deny=YES
+userlist_file=/etc/vsftpd/user_list
+pasv_enable=YES
+pasv_min_port=30000
+pasv_max_port=30100
+local_umask=022
+seccomp_sandbox=NO
+
+<!-- /etc/vsftpd/users/alice -->
+write_enable=YES
+
+<!-- /etc/vsftpd/users/mika -->
+write_enable=NO
+
+<!-- /etc/vsftpd/users_list -->
+eiri
+
+<!-- restart vsftpd -->
+pkillall vsftpd
+vsftpd /etc/vsftpd.conf &
+```
+
+Lalu, dilakukan pengujian menggunakan akun **alice** untuk membuat atau mengunggah `signal_alice.txt` melalui FTP.
+
+```bash
+lftp -u alice,alice123 10.64.2.2
+
+put signal_alice.txt
+ls
+```
+
+![ftp alice write](assets/ftp-alice-write.png)
+
+Berikutnya dilakukan percobaan login menggunakan akun **eiri**.
+
+![ftp eiri denied](assets/ftp-eiri-denied.png)
+
 14. Pada soal ini kita diminta untuk melakukan analisis file capture `wired_bruteforce.pcapng` untuk mengidentifikasi alamat IP penyerang, target IP beserta port yang diserang, password user `lain_admin`, serta web server software dan versinya.
 
 *Langkah Penyelesaian*
