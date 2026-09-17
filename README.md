@@ -716,7 +716,7 @@ Selanjutnya kita klik kanan dan **follow TCP Stream**, disitu kita dapat melihat
 
 20. Mengidentifikasi versi protokol TLS yang dinegosiasikan, nama domain (SNI) yang diakses, alamat IP server HTTPS penyerang, User-Agent yang digunakan, serta HTTP request method dan path yang tersembunyi di dalam sesi dekripsi pada file capture `wired_tls_decrypt.pcapng` bersama `keyslogfile.txt`.
 
-Langkah Penyelesaian
+*Langkah Penyelesaian*
 
 Pertama-tama kita akan mencari **Client Hello** atau bisa dengan filter `tls.handshake.type == 1` dan dibagian **Destinations** terdapat IP server penyerang dan TLS protocol apa. Selanjutnya, untuk mencari SNI, klik dua kali pada packet **Client Hello** lalu ke panel detail **Handshake Protocol : Client Hello -> Extensions : Server_name -> Server Name Indication Extention**. Akan terdapat nama domai (SNI).
 
