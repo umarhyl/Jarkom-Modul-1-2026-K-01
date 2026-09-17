@@ -687,3 +687,50 @@ Lalu dilanjutkan dengan mengklik kanan dan **follow HTTP stream** pada packet te
 
 ![Validasi_Soal-17](assets/Validasi_Soal-17.png)
 
+18. Menganalisis file capture `wired_smb_transfer.pcapng` untuk mengidentifikasi nama protokol jaringan yang dieksploitasi, IP pengirim dan penerima, folder tujuan penyimpanan malware pada sistem korban, serta nama file executable malware yang ditransfer.
+
+*Langkah Penyelesaian*
+
+Langkah pertama yaitu mengidentifikasi nama protokol jaringan yang dieksploitasi, protokol biasany ditulis menjadi `SMB` atau `SMB2`, untuk hal ini kami pertama-tama memfilter `smb` namun tidak ada packet tersebut dan ketika memfilter `smb2` maka akan keluar banyak packet protokol `SMB2`.
+
+Selanjutnya, kami memfilter dengan `smb2.filename` untuk melihat file apa yang sedang ditulis oleh penyerang lalu lihat bagian info dan cari yang memiliki **Create Request File**. Di kolom **Source** packet tersebut terlihat IP penyerang, lalu kita akan melihat ke bagian **SMB2 (Server Message Block Protocol version 2)**, yang **Create Request**.
+
+![smb2](assets/smb2.filename.png)
+
+Di dalam tersebut terlihat Filename: `System32\wired_trojan_payload.exe`. `System32` adalah folder tujuan dan `wired_trojan_payload.exe` adalah filename malwarenya.
+
+![Validasi_Soal-18](assets/Validasi_Soal-18.png)
+
+
+19. Menganalisis file capture `wired_smtp_threat.pcap` pada stream TCP terkait, identifikasi alamat email korban yang ditargetkan, password korban yang diklaim bocor oleh penyerang, jenis malware yang diinfeksikan, batas waktu (dalam hari) yang diberikan, serta `MailClientID` yang tercantum pada pesan.
+
+*Langkah Penyelesaian*
+
+Karena kita sudah tau isinya ada `MailClientID` maka kita akan mengfilter packet dengan `frame contains "MailClientID"`.
+
+![MailClientID](assets/MailClientID.png)
+
+Selanjutnya kita klik kanan dan **follow TCP Stream**, disitu kita dapat melihat Email penyerang dan korban yang ditargetkan, pesan dr penyerang dan ancaman oleh penyerang.
+
+![Validasi_Soal-19](assets/Validasi_Soal-19.png)
+
+20. Mengidentifikasi versi protokol TLS yang dinegosiasikan, nama domain (SNI) yang diakses, alamat IP server HTTPS penyerang, User-Agent yang digunakan, serta HTTP request method dan path yang tersembunyi di dalam sesi dekripsi pada file capture `wired_tls_decrypt.pcapng` bersama `keyslogfile.txt`.
+
+*Langkah Penyelesaian*
+
+Pertama-tama kita akan mencari **Client Hello** atau bisa dengan filter `tls.handshake.type == 1` dan dibagian **Destinations** terdapat IP server penyerang dan TLS protocol apa. Selanjutnya, untuk mencari SNI, klik dua kali pada packet **Client Hello** lalu ke panel detail **Handshake Protocol : Client Hello -> Extensions : Server_name -> Server Name Indication Extention**. Akan terdapat nama domai (SNI).
+
+![TampakAwal](assets/TampakAwal.png)
+
+Kami diberi keylogs untuk melihat `User-Agent`, HTTP request method dan path yang tersembunyi. Klik menu **Edit**, lalu pilih **Preferences**. Klik dropdown pada **Protocols**, lalu cari dan pencet **TSL**. Cari kolom yang bernama **(Pre)-Master-Secret log filename** lalu browse file keylogs yang sudah dikasih, pencet **OK**. 
+
+![TLS](assets/TLS.png)
+
+Maka tampilan akan berbeda dan akan langsung terlihat `User-Agent`, method, dan path pada panel bawah.
+
+![TampakAkhir](assets/TampakAkhir.png)
+
+*Berikut adalah validasi temuan kami:*
+
+![Validasi_Soal-20](assets/Validasi_Soal-20.png)
+
