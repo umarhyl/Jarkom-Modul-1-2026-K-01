@@ -40,8 +40,8 @@ Prefix IP kelompok kami adalah `10.64.X.X`. Pembagian subnet dan gateway yang di
 Pertama, kita filterkan dengan `ftp.response.code==220`. Disini kita memakai kode `220` karena kode ini digunakan untuk mengundang klien untuk mengirimkan kredensial otentikasi (nama pengguna dan kata sandi). 
 Kita menemukan Packet dengan info `220 Welcome to Wired FTP Server (vsftpd 3.0.5)`. Source pada packet tersebut adalah alamat IP server FTP penyerang dan info `(vsftpd 3.0.5)` adalah banner software FTP. 
 
-
+![ftp.response.code==220](assets/Filter 220.png)
 
 Selanjutnya, kita bisa klik kanan dan **follow TCP stream**, disini kita akan terjawab kredensial login penyerang, serta ukuran (size in bytes) dari file malware.
 
-
+![Validasi Pocket & Follow TCP Stream](assets/Validasi Pocket & Follow TCP stream.png)
