@@ -417,7 +417,7 @@ Berikutnya dilakukan percobaan login menggunakan akun **eiri**.
 
 8. Kelompok rahasia Knights perlu mengirimkan dokumen laporan intelijen ke FTP Server Chisa. Lakukan koneksi FTP client dari node Knights ke FTP Server Chisa menggunakan akun alice. Upload file berikut ([link file](https://drive.google.com/drive/folders/1tvZpueSH9E3GWwXM6KNnM64Y5wNoIAYP?usp=sharing)). Analisis sesi Wireshark dan sebutkan: perintah FTP untuk upload (STOR), kode status sukses server (226), dan port data TCP yang dinegosiasikan pada mode PASV.
 
-File [`knights_report.txt](artefacts/knights_report.txt). Selanjutnya dilakukan koneksi ke FTP server Chisa menggunakan akun alice dan mode PASV. Capture dimulai sebelum koneksi FTP dilakukan agar proses negosiasi port ikut terekam.
+File [`knights_report.txt](artefacts/knights_report.txt). Selanjutnya dilakukan koneksi ke FTP server Chisa menggunakan akun alice dan mode PASV.
 
 ```bash
 lftp -u alice,alice123 ftp://10.64.2.2
