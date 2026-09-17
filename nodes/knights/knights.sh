@@ -1,8 +1,5 @@
 #!/bin/sh
 
-# Question 10
-ping -c 77 -s 128 -i 0.3 10.64.2.2
-
 # Question 12 - 13
 # ssh (port 22)
 apk update
@@ -31,5 +28,3 @@ pkill sshd 2>/dev/null || true
 mkdir -p /www
 echo "Knights HTTP Server" > /www/index.html
 httpd -p 80 -h /www
-
-

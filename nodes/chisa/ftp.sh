@@ -43,6 +43,7 @@ pasv_enable=YES
 pasv_min_port=30000
 pasv_max_port=30100
 local_umask=022
+seccomp_sandbox=NO
 EOF
 
 cat <<EOF > "$VSFTPD_USERS/alice"

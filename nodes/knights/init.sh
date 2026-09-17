@@ -8,5 +8,3 @@ iface eth0 inet static
     gateway 10.64.3.1
     up echo "nameserver 8.8.8.8" > /etc/resolv.conf
 EOF
-
-# 
