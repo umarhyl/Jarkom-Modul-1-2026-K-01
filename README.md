@@ -33,6 +33,137 @@ Prefix IP kelompok kami adalah `10.64.X.X`. Pembagian subnet dan gateway yang di
 | Switch 3 | Knights, Eiri | 10.64.3.0/24 | 10.64.3.1 |
 
 
+2. Karena menurut Lain pada saat itu The Wired masih terisolasi dari dunia luar, konfigurasikan router Lain agar dapat tersambung langsung ke jaringan internet publik melalui NAT/DHCP pada interface eth0.
+
+Untuk membuat Lain terhubung ke internet, interface **eth0** yang terhubung dengan NAT dikonfigurasi agar memperoleh alamat IP melalui DHCP. Konfigurasi yang digunakan pada file `/etc/network/interfaces` adalah sebagai berikut:
+
+```text
+auto eth0
+iface eth0 inet dhcp
+```
+
+Setelah konfigurasi diterapkan, alamat interface dan default route diperiksa menggunakan `ip -br a` dan `ip route`.
+
+![lain dhcp](assets/lain-dhcp.png)
+
+Selanjutnya dilakukan pengujian koneksi dari Lain ke `8.8.8.8` untuk memastikan router dapat menjangkau jaringan internet.
+
+![lain internet](assets/lain-internet.png)
+
+3. Setelah router Lain terhubung ke internet, pastikan seluruh Entitas (Client) di bawah Switch 1, Switch 2, dan Switch 3 dapat saling terhubung dan berkomunikasi satu sama lain melalui konfigurasi routing.
+
+Agar seluruh client dapat berkomunikasi, setiap interface LAN pada Lain diberikan alamat IP statis yang menjadi gateway bagi subnet terkait. Konfigurasi interface LAN Lain adalah sebagai berikut:
+
+```text
+auto eth1
+iface eth1 inet static
+    address 10.64.1.1
+    netmask 255.255.255.0
+
+auto eth2
+iface eth2 inet static
+    address 10.64.2.1
+    netmask 255.255.255.0
+
+auto eth3
+iface eth3 inet static
+    address 10.64.3.1
+    netmask 255.255.255.0
+```
+
+![lain ip lan](assets/lain-ip-lan.png)
+
+Selanjutnya, masing-masing client diberikan alamat IP statis dan default gateway sesuai dengan segmennya. Konfigurasi yang digunakan pada setiap node adalah sebagai berikut:
+
+**Alice**
+
+```text
+auto eth0
+iface eth0 inet static
+    address 10.64.1.2
+    netmask 255.255.255.0
+    gateway 10.64.1.1
+    up echo "nameserver 192.168.122.1" > /etc/resolv.conf
+```
+
+**Mika**
+
+```text
+auto eth0
+iface eth0 inet static
+    address 10.64.1.3
+    netmask 255.255.255.0
+    gateway 10.64.1.1
+    up echo "nameserver 192.168.122.1" > /etc/resolv.conf
+```
+
+**Chisa**
+
+```text
+auto eth0
+iface eth0 inet static
+    address 10.64.2.2
+    netmask 255.255.255.0
+    gateway 10.64.2.1
+    up echo "nameserver 192.168.122.1" > /etc/resolv.conf
+```
+
+**Knights**
+
+```text
+auto eth0
+iface eth0 inet static
+    address 10.64.3.2
+    netmask 255.255.255.0
+    gateway 10.64.3.1
+    up echo "nameserver 192.168.122.1" > /etc/resolv.conf
+```
+
+**Eiri**
+
+```text
+auto eth0
+iface eth0 inet static
+    address 10.64.3.3
+    netmask 255.255.255.0
+    gateway 10.64.3.1
+    up echo "nameserver 192.168.122.1" > /etc/resolv.conf
+```
+
+![client ip route](assets/client-ip-route.png)
+
+Pada Lain, IP forwarding diaktifkan agar paket dapat diteruskan antarinterface. Jika terdapat pembatasan firewall, aturan FORWARD disesuaikan agar trafik antarsegmen diizinkan.
+
+```text
+sysctl -w net.ipv4.ip_forward=1
+```
+
+![lain routing](assets/lain-routing.png)
+
+Ketiga subnet LAN merupakan jaringan yang terhubung langsung ke Lain, sehingga route menuju subnet tersebut tercatat sebagai connected routes. Client menggunakan default gateway untuk mencapai subnet lain. Selanjutnya dilakukan ping dari setiap client menuju empat client lainnya.
+
+![ping others](assets/ping-others.png)
+
+4. Lain ingin agar setiap Entitas (Client) memiliki kemandirian di The Wired. Konfigurasikan firewall/iptables (NAT Masquerade) dan DNS resolver agar setiap Client dapat terhubung ke internet secara mandiri (dapat melakukan ping ke 192.168.122.1 dan membuka domain web google.com).
+
+Untuk memberikan akses internet kepada seluruh client, dilakukan konfigurasi NAT Masquerade pada Lain. Aturan ini mengganti alamat sumber paket dari jaringan client dengan alamat interface keluar Lain, yaitu **eth0**.
+
+```text
+iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+iptables -A FORWARD -i eth1 -o eth0 -j ACCEPT
+iptables -A FORWARD -i eth2 -o eth0 -j ACCEPT
+iptables -A FORWARD -i eth3 -o eth0 -j ACCEPT
+```
+
+![lain nat](assets/lain-nat.png)
+
+Selanjutnya dilakukan konfigurasi DNS resolver pada masing-masing client agar nama domain dapat diterjemahkan menjadi alamat IP. Resolver yang digunakan adalah `192.168.122.1` dengan konfigurasi berikut, lalu dilakukan pengujian koneksi ke internet.
+
+```text
+up echo "nameserver 192.168.122.1" > /etc/resolv.conf
+```
+
+![client dns internet](assets/client-dns-internet.png)
 
 16. Pada soal ini kita diminta untuk melakukan analisis lalu lintas FTP untuk mengidentifikasi alamat IP server FTP penyerang, banner software FTP yang digunakan, kredensial login penyerang, serta ukuran (size in bytes) dari file malware knights_payload.exe yang diunduh.
 
