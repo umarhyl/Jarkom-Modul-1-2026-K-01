@@ -425,6 +425,28 @@ Selanjutnya, untuk mencari password user `lain_admin`, web server software dan v
 
 ![Validasi_Soal-14](assets/Validasi_Soal-14.png)
 
+15. Pada soal ini kita diminta untuk melakukan analisis file capture `wired_usb_hid.pcap` untuk mengidentifikasi Vendor ID dan Product ID perangkat USB dari deskriptor USB, alamat nomor device USB, serta pesan rahasia yang berhasil dicuri dari keystroke.
+
+*Langkah Penyelesaian*
+
+Mulai dengan mencari Vendor ID & Product ID, filter packet dengan `usb.bDescriptorType==1` untuk mencari informasi identitas utama perangkat lalu cari dengan info `"GET DESCRIPTOR Response DEVICE"`. Terdapat Device Descriptor yang berisi ID Vendor dan Product.
+
+![DeviceDescriptor](assets/DEVICE_DESCRIPTOR.png)
+
+Selanjutnya, aku buka menu **Statistics -> Conversations** dan di bagian USB untuk melihat alamat device USB. Disini Address A hanya 2 yaitu host dan `2.7.1`, dari sini kita tau bahwa `2.7.1` adalah Alamatnya. Namun, alamat USB biasanya Bus.Device.Endpoint maka dari itu nomor Device USB ada 7.
+
+![Statistics->Conversations](assets/USB_Conversations.png)
+
+Untuk mendapatkan pesan rahasia, dilakukan filter dengan `usb.capdata`. Disini kita bisa lihat keystroke di `Leftover Capture Data`. Lalu, kita baca `Byte 0` (untuk modifier keys) dan `Byte 2` (untuk tombol utama yang sedang dipegang) untuk mencari pesan rahasianya.
+
+![LeftoverCaptureData](assets/Secret_code.png).
+
+*Berikut adalah bagaimana kami menerjemahkan Byte nya:*
+![Byte Code](assets/Byte_code.jpeg)
+
+*Berikut adalah validasi temuan kami:*
+![Validasi_Soal-14](assets/Validasi_Soal-15.png)
+
 16. Pada soal ini kita diminta untuk melakukan analisis lalu lintas FTP untuk mengidentifikasi alamat IP server FTP penyerang, banner software FTP yang digunakan, kredensial login penyerang, serta ukuran (size in bytes) dari file malware knights_payload.exe yang diunduh.
 
 *Langkah Penyelesaian*
@@ -436,4 +458,4 @@ Kita menemukan Packet dengan info `220 Welcome to Wired FTP Server (vsftpd 3.0.5
 
 Selanjutnya, kita bisa klik kanan dan **follow TCP stream**, disini kita akan terjawab kredensial login penyerang, serta ukuran (size in bytes) dari file malware.
 
-![Validasi Pocket & Follow TCP Stream](assets/ValidasiPocket&FollowTCPstream.png)
+![Validasi Pocket & Follow TCP Stream](assets/Validasi_Soal-16.png)
