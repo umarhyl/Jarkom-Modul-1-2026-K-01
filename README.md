@@ -285,6 +285,60 @@ iptables -A FORWARD -i eth3 -o eth0 -j ACCEPT
 
 ![lain after restart](assets/lain-after-restart.png)
 
+6. Mika mencurigai adanya anomali traffic pada segmen jaringannya. Jalankan generator traffic berikut ([link file](https://drive.google.com/drive/folders/1ZjFvWIjvAQAjE9pPthm7V_bGyaSt93lY?usp=sharing)) pada node Mika, lalu lakukan packet sniffing menggunakan Wireshark pada interface node Mika. Terapkan display filter khusus untuk menyaring paket yang berprotokol DNS atau ICMP. Tunjukkan screenshot hasil filter beserta ringkasan paket yang lolos.
+
+```bash
+#!/bin/bash
+# ============================================
+# Traffic Generator — Protocol 7 Network
+# Serial Experiments Lain — Modul 1 Jarkom 2026
+# Jalankan di node MIKA untuk generate traffic DNS & ICMP
+# ============================================
+
+echo "============================================"
+echo "  Protocol 7 Traffic Generator v2026"
+echo "  Node: Mika Iwakura"
+echo "============================================"
+echo "[*] Generating DNS & ICMP traffic..."
+
+# ICMP Traffic
+ping -c 5 8.8.8.8 &
+ping -c 5 1.1.1.1 &
+ping -c 3 its.ac.id &
+
+# DNS Queries
+nslookup google.com 8.8.8.8 &
+nslookup its.ac.id 8.8.8.8 &
+nslookup github.com 1.1.1.1 &
+dig @8.8.8.8 example.com A &
+dig @1.1.1.1 cloudflare.com AAAA &
+
+wait
+echo "[*] Traffic generation complete."
+echo "[*] Check Wireshark for captured packets."
+```
+
+![mika start traffic](assets/mika-start-traffic.gif)
+
+Pada Wireshark diterapkan display filter berikut:
+
+```text
+dns || icmp
+```
+
+Filter tersebut menampilkan paket DNS atau ICMP. DNS digunakan untuk mengamati resolusi nama, sedangkan ICMP dapat memperlihatkan pesan seperti Echo Request dan Echo Reply.
+
+![mika dns icmp](assets/mika-dns-icmp.png)
+
+Ringkasan paket yang lolos filter adalah sebagai berikut:
+
+| Protokol |          Jumlah paket | Sumber dan tujuan                                         | Informasi paket                                                                                                                                |
+| -------- | --------------------: | --------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| DNS      | **22 packet** | Mika ↔ `8.8.8.8`, Mika ↔ `1.1.1.1`                        | Query/response `its.ac.id`, `example.com`, `github.com`, `cloudflare.com`, dan `google.com`. Record yang terlihat meliputi **A** dan **AAAA**. |
+| ICMP     |          **26 paket** | Mika ↔ `8.8.8.8`, Mika ↔ `1.1.1.1`, Mika ↔ `103.94.189.4` | ICMP **Echo Request (Type 8, Code 0)** dan **Echo Reply (Type 0, Code 0)** dengan pola request–reply.                                          |
+
+file capture: [`mika-capture-icmp-dns.pcapng`](assets/mika-capture.pcapng).
+
 14. Pada soal ini kita diminta untuk melakukan analisis file capture `wired_bruteforce.pcapng` untuk mengidentifikasi alamat IP penyerang, target IP beserta port yang diserang, password user `lain_admin`, serta web server software dan versinya.
 
 *Langkah Penyelesaian*
