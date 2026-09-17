@@ -444,6 +444,28 @@ Pada Wireshark, FTP diperiksa untuk menemukan perintah `PASV`, respons `227`, pe
 
 file capture: [`knights-ftp-upload.pcapng`](./captures/knights_ftp_upload.pcapng)
 
+9. Mika mengakses dokumen Protokol Tujuh di ([link file](https://drive.google.com/drive/folders/1S3hG0dnZBTkCta4uILWwKVc6dSYYGRJ6?usp=sharing)) dari FTP Server Chisa. Dari node Mika, unduh file tersebut menggunakan akun mika. Setelah itu, buktikan pembatasan read-only dengan mencoba mengunggah file baru dari akun mika, dan tunjukkan pesan error respon server (error 550 Permission denied) saat mika mencoba melakukan upload.
+
+File [`protocol7_manifesto.txt`](artefacts/protocol7_manifesto.txt) ditaruh pada direktori `/var/wired/data` di node Chisa. 
+
+Lalu, dari node Mika dilakukan login menggunakan akun mika dan download dokumen tersebut.
+
+```bash
+lftp -u mika,mika123 ftp://10.64.2.2
+get protocol7_manifesto.txt
+```
+
+![mika ftp download](assets/mika-ftp-download.png)
+
+Untuk menguji pembatasan read-only, dibuat file percobaan pada Mika dan dilakukan upload melalui akun yang sama.
+
+```bash
+lftp -u mika,mika123 ftp://10.64.2.2
+put mika_upload_test.txt
+```
+
+![mika ftp readonly](assets/mika-ftp-readonly.png)
+
 14. Pada soal ini kita diminta untuk melakukan analisis file capture `wired_bruteforce.pcapng` untuk mengidentifikasi alamat IP penyerang, target IP beserta port yang diserang, password user `lain_admin`, serta web server software dan versinya.
 
 *Langkah Penyelesaian*
