@@ -165,6 +165,126 @@ up echo "nameserver 192.168.122.1" > /etc/resolv.conf
 
 ![client dns internet](assets/client-dns-internet.png)
 
+5. Eiri tetap berupaya menanamkan kekacauan ke dalam jaringan. Untuk mengantisipasi restart tiba-tiba, pastikan seluruh konfigurasi jaringan tidak hilang saat semua node di-restart. Buat script verifikasi di /root/cek_status.sh pada router Lain yang menampilkan ringkasan interface (ip -br a) dan status tabel NAT (iptables -t nat -L -v -n) setelah reboot.
+
+Agar konfigurasi tetap berlaku setelah restart, pengaturan interface, route, DNS, IP forwarding, dan aturan iptables disimpan melalui mekanisme startup yang digunakan pada node.
+
+**Lain**
+
+```bash
+#!/bin/bash
+
+cat <<EOF > /etc/network/interfaces
+auto eth0
+iface eth0 inet dhcp
+
+auto eth1
+iface eth1 inet static
+    address 10.64.1.1
+    netmask 255.255.255.0
+
+auto eth2
+iface eth2 inet static
+    address 10.64.2.1
+    netmask 255.255.255.0
+
+auto eth3
+iface eth3 inet static
+    address 10.64.3.1
+    netmask 255.255.255.0
+EOF
+
+apt update
+which iptables &>/dev/null || apt install iptables -y
+
+iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+
+iptables -A FORWARD -i eth1 -o eth0 -j ACCEPT
+iptables -A FORWARD -i eth2 -o eth0 -j ACCEPT
+iptables -A FORWARD -i eth3 -o eth0 -j ACCEPT
+
+/root/cek_status.sh
+```
+
+**Client**
+
+```bash
+<!-- Alice -->
+#!/bin/sh
+
+cat <<EOF > /etc/network/interfaces
+auto eth0
+iface eth0 inet static
+    address 10.64.1.2
+    netmask 255.255.255.0
+    gateway 10.64.1.1
+    up echo "nameserver 192.168.122.1" > /etc/resolv.conf
+EOF
+
+<!-- Mika -->
+#!/bin/sh
+
+cat <<EOF > /etc/network/interfaces
+auto eth0
+iface eth0 inet static
+    address 10.64.1.3
+    netmask 255.255.255.0
+    gateway 10.64.1.1
+    up echo "nameserver 192.168.122.1" > /etc/resolv.conf
+EOF
+
+<!-- Chisa -->
+#!/bin/sh
+
+cat <<EOF > /etc/network/interfaces
+auto eth0
+iface eth0 inet static
+    address 10.64.2.2
+    netmask 255.255.255.0
+    gateway 10.64.2.1
+    up echo "nameserver 192.168.122.1" > /etc/resolv.conf
+EOF
+
+<!-- Knights -->
+#!/bin/sh
+
+cat <<EOF > /etc/network/interfaces
+auto eth0
+iface eth0 inet static
+    address 10.64.3.2
+    netmask 255.255.255.0
+    gateway 10.64.3.1
+    up echo "nameserver 192.168.122.1" > /etc/resolv.conf
+EOF
+#
+<!-- Eiri -->
+#!/bin/sh
+
+cat <<EOF > /etc/network/interfaces
+auto eth0
+iface eth0 inet static
+    address 10.64.3.3
+    netmask 255.255.255.0
+    gateway 10.64.3.1
+    up echo "nameserver 192.168.122.1" > /etc/resolv.conf
+EOF
+```
+
+Kemudian dibuat script `/root/cek_status.sh` pada Lain untuk memeriksa alamat interface dan tabel NAT setelah node dinyalakan kembali.
+
+```bash
+#!/bin/sh
+
+sysctl -w net.ipv4.ip_forward=1
+
+iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+iptables -A FORWARD -i eth1 -o eth0 -j ACCEPT
+iptables -A FORWARD -i eth2 -o eth0 -j ACCEPT
+iptables -A FORWARD -i eth3 -o eth0 -j ACCEPT
+```
+
+![lain after restart](assets/lain-after-restart.png)
+
 14. Pada soal ini kita diminta untuk melakukan analisis file capture `wired_bruteforce.pcapng` untuk mengidentifikasi alamat IP penyerang, target IP beserta port yang diserang, password user `lain_admin`, serta web server software dan versinya.
 
 *Langkah Penyelesaian*
