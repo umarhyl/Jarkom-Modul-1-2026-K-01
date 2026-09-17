@@ -701,3 +701,15 @@ Di dalam tersebut terlihat Filename: `System32\wired_trojan_payload.exe`. `Syste
 
 ![Validasi_Soal-18](assets/Validasi_Soal-18.png)
 
+
+19. Menganalisis file capture `wired_smtp_threat.pcap` pada stream TCP terkait, identifikasi alamat email korban yang ditargetkan, password korban yang diklaim bocor oleh penyerang, jenis malware yang diinfeksikan, batas waktu (dalam hari) yang diberikan, serta `MailClientID` yang tercantum pada pesan.
+
+*Langkah Penyelesaian*
+
+Karena kita sudah tau isinya ada `MailClientID` maka kita akan mengfilter packet dengan `frame contains "MailClientID"`.
+
+![MailClientID](assets/MailClientID.png)
+
+Selanjutnya kita klik kanan dan **follow TCP Stream**, disitu kita dapat melihat Email penyerang dan korban yang ditargetkan, pesan dr penyerang dan ancaman oleh penyerang.
+
+![Validasi_Soal-19](assets/Validasi_Soal-19.png)
