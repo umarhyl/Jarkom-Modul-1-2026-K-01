@@ -724,7 +724,7 @@ Pertama-tama kita akan mencari **Client Hello** atau bisa dengan filter `tls.han
 
 Kami diberi keylogs untuk melihat `User-Agent`, HTTP request method dan path yang tersembunyi. Klik menu **Edit**, lalu pilih **Preferences**. Klik dropdown pada **Protocols**, lalu cari dan pencet **TSL**. Cari kolom yang bernama **(Pre)-Master-Secret log filename** lalu browse file keylogs yang sudah dikasih, pencet **OK**. 
 
-![TSL](assets/TSL.png)
+![TLS](assets/TLS.png)
 
 Maka tampilan akan berbeda dan akan langsung terlihat `User-Agent`, method, dan path pada panel bawah.
 
