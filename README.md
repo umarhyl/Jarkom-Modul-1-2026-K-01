@@ -506,8 +506,32 @@ RTT menunjukkan waktu perjalanan paket menuju tujuan dan kembali ke pengirim. Uk
 
 Berdasarkan hasil tersebut, kondisi koneksi Knights ke Chisa tergolong stabil. Seluruh 77 paket yang dikirim berhasil diterima kembali tanpa packet loss. Nilai RTT minimum sebesar 0.332 ms, rata-rata 0.603 ms, dan maksimum 1.241 ms menunjukkan bahwa komunikasi antar-node berlangsung dengan cepat dan memiliki latensi yang rendah.
 
-
 file capture : [`knights_icmp_chisa.pcapng`](captures/knights_icmp_chisa.pcapng)
+
+11. Buktikan kelemahan protokol Telnet dengan membuat akun phantom_user dan password wired_ghost pada layanan telnetd di node Chisa. Lakukan login Telnet dari node Eiri ke node Chisa dan tangkap sesi menggunakan Wireshark. Tunjukkan kredensial plain text melalui fitur Follow TCP Stream, serta jelaskan mengapa setiap karakter terkirim dalam paket TCP terpisah.
+
+Secara default, telnetd udah ada di alpine, jadi hanya perlu akun `phantom_user` dengan password praktikum `wired_ghost`.
+
+```text
+# add user phantom_user
+adduser -D phantom_user
+echo "phantom_user:wired_ghost" | chpasswd
+
+# run telnetd
+telnetd -p 23 &
+```
+
+Selanjutnya dilakukan login Telnet dari Eiri menuju Chisa.
+
+![eiri telnet chisa](assets/eiri-telnet-chisa.gif)
+
+Pada Wireshark, dipilih salah satu paket sesi Telnet lalu dibuka menu **Follow > TCP Stream** untuk melihat aliran data sesi.
+
+![telnet follow stream](assets/telnet-follow-stream.png)
+
+Telnet tidak mengenkripsi sesi sehingga data autentikasi dapat dibaca dari hasil capture. Meskipun password tidak ditampilkan kembali pada terminal, karakter password tetap dikirim melalui jaringan.
+
+file capture: [`eiri-telnet-chisa.pcapng`](captures/eiri_telnet_chisa.pcapng)
 
 14. Pada soal ini kita diminta untuk melakukan analisis file capture `wired_bruteforce.pcapng` untuk mengidentifikasi alamat IP penyerang, target IP beserta port yang diserang, password user `lain_admin`, serta web server software dan versinya.
 
