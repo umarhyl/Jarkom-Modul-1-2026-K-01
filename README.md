@@ -687,3 +687,17 @@ Lalu dilanjutkan dengan mengklik kanan dan **follow HTTP stream** pada packet te
 
 ![Validasi_Soal-17](assets/Validasi_Soal-17.png)
 
+18. Menganalisis file capture `wired_smb_transfer.pcapng` untuk mengidentifikasi nama protokol jaringan yang dieksploitasi, IP pengirim dan penerima, folder tujuan penyimpanan malware pada sistem korban, serta nama file executable malware yang ditransfer.
+
+*Langkah Penyelesaian*
+
+Langkah pertama yaitu mengidentifikasi nama protokol jaringan yang dieksploitasi, protokol biasany ditulis menjadi `SMB` atau `SMB2`, untuk hal ini kami pertama-tama memfilter `smb` namun tidak ada packet tersebut dan ketika memfilter `smb2` maka akan keluar banyak packet protokol `SMB2`.
+
+Selanjutnya, kami memfilter dengan `smb2.filename` untuk melihat file apa yang sedang ditulis oleh penyerang lalu lihat bagian info dan cari yang memiliki **Create Request File**. Di kolom **Source** packet tersebut terlihat IP penyerang, lalu kita akan melihat ke bagian **SMB2 (Server Message Block Protocol version 2)**, yang **Create Request**.
+
+![smb2](assets/smb2.filename.png)
+
+Di dalam tersebut terlihat Filename: `System32\wired_trojan_payload.exe`. `System32` adalah folder tujuan dan `wired_trojan_payload.exe` adalah filename malwarenya.
+
+![Validasi_Soal-18](assets/Validasi_Soal-18.png)
+
