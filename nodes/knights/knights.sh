@@ -4,25 +4,30 @@
 # ssh (port 22)
 apk update
 apk add openssh
-ssh-keygen -A
 
-id mika_admin >/dev/null 2>&1 || adduser -D mika_admin
+adduser -D -s /bin/ash mika_admin
 echo "mika_admin:mika123" | chpasswd
 
-sed -i \
-    -e 's/^#*PubkeyAuthentication.*/PubkeyAuthentication yes/' \
-    -e 's/^#*PasswordAuthentication.*/PasswordAuthentication yes/' \
-    /etc/ssh/sshd_config
+ssh-keygen -A
 
-grep -q '^PubkeyAuthentication ' /etc/ssh/sshd_config ||
-    echo "PubkeyAuthentication yes" >> /etc/ssh/sshd_config
+mkdir -p /home/mika_admin/.ssh
+chmod 700 /home/mika_admin/.ssh
+chown -R mika_admin:mika_admin /home/mika_admin/.ssh
 
-grep -q '^PasswordAuthentication ' /etc/ssh/sshd_config ||
-    echo "PasswordAuthentication yes" >> /etc/ssh/sshd_config
+cp /etc/ssh/sshd_config /etc/ssh/sshd_config.bak
+
+sed -i '/^#*PubkeyAuthentication /d' /etc/ssh/sshd_config
+sed -i '/^#*PasswordAuthentication /d' /etc/ssh/sshd_config
+sed -i '/^#*PermitRootLogin /d' /etc/ssh/sshd_config
+
+cat >> /etc/ssh/sshd_config <<EOF
+PubkeyAuthentication yes
+PasswordAuthentication yes
+PermitRootLogin no
+EOF
 
 pkill sshd 2>/dev/null || true
 /usr/sbin/sshd
-
 
 # http (port 80)
 mkdir -p /www

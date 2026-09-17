@@ -588,6 +588,46 @@ Port terbuka membalas permintaan SYN dengan SYN-ACK untuk memulai pembentukan ko
 
 file capture: [`alice-nc-knights.pcapng`](captures/alice_nc_knights.pcapng)
 
+13. Lain memerintahkan agar administrasi jarak jauh menggunakan SSH secara aman tanpa password. Install OpenSSH server pada node Knights, buat pasangan kunci SSH (ssh-keygen) pada node Mika untuk user mika_admin, dan konfigurasikan public key authentication (PasswordAuthentication no). Lakukan koneksi SSH dari node Mika ke node Knights, tangkap sesi menggunakan Wireshark, identifikasi paket Protocol Version Exchange dan Key Exchange, serta jelaskan mengapa kredensial tidak terlihat dalam bentuk teks terbuka seperti pada Telnet.
+
+Konfigurasi menggunakan script [`mika.sh`](nodes/mika/mika.sh) dan [`knights.sh`](nodes/knights/knights.sh). Copy public key dari Mika ke Knights menggunakan `ssh-copy-id` atau metode lain, lalu ubah konfigurasi SSH server pada Knights untuk menonaktifkan autentikasi password. Setelah public key Mika dipasang pada Knights dan `PasswordAuthentication no` diterapkan, pengujian dilakukan sebagai berikut.
+
+```bash
+<!-- di Knights -->
+echo "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEd7foBvYXWw7Tk6N5ioPUqBo7QmyidS4X6tKMMHrqXe root@mika" > /home/mika_admin/.ssh/authorized_keys
+chown mika_admin:mika_admin /home/mika_admin/.ssh/authorized_keys
+chmod 600 /home/mika_admin/.ssh/authorized_keys
+
+sed -i 's/PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
+
+pkill sshd 2>/dev/null || true
+/usr/sbin/sshd
+
+<!-- di Mika -->
+ssh mika_admin@10.64.3.2
+```
+
+![mika ssh knights](assets/mika-ssh-knights.gif)
+
+Pada Wireshark, gunakan filter berikut:
+
+```wireshark
+tcp.port == 22 && ip.addr == 10.64.1.3 && ip.addr == 10.64.3.2
+```
+
+| Paket | Nomor frame | Hasil pengamatan |
+| --- | --- | --- |
+| Protocol Version Exchange | 4 (Mika), 6 (Knights) | Client dan server mengirim banner `SSH-2.0-OpenSSH_10.2`. |
+| Key Exchange Init / pertukaran kunci | 9, 11, 12, 13 | Frame 9 dan 11 berisi Key Exchange Init dari Mika dan Knights. Frame 12 berisi PQ/T Hybrid Key Exchange Init dan frame 13 berisi balasannya, menggunakan algoritma `mlkem768x25519-sha256` dengan host key `ssh-ed25519`. |
+| New Keys | 13 (Knights), 16 (Mika) | Kedua arah mulai menggunakan kunci sesi dengan enkripsi `chacha20-poly1305@openssh.com`. Frame tersebut juga memuat Encrypted packet setelah New Keys. |
+
+![ssh version exchange](assets/ssh-version-exchange.png)
+![ssh key exchange](assets/ssh-key-exchange.png)
+
+SSH mengenkripsi data autentikasi dan isi sesi setelah pertukaran kunci, sehingga tidak terbaca sebagai teks terbuka seperti Telnet. Pada autentikasi public key, client membuktikan kepemilikan kunci privat melalui tanda tangan digital; kunci privat tidak dikirim dan password akun tidak digunakan. Banner versi SSH pada awal koneksi masih dapat terlihat.
+
+File capture: [`ssh_mika_knigths.pcapng`](captures/ssh_mika_knigths.pcapng).
+
 14. Pada soal ini kita diminta untuk melakukan analisis file capture `wired_bruteforce.pcapng` untuk mengidentifikasi alamat IP penyerang, target IP beserta port yang diserang, password user `lain_admin`, serta web server software dan versinya.
 
 *Langkah Penyelesaian*
