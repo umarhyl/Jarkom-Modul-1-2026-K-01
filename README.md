@@ -533,6 +533,61 @@ Telnet tidak mengenkripsi sesi sehingga data autentikasi dapat dibaca dari hasil
 
 file capture: [`eiri-telnet-chisa.pcapng`](captures/eiri_telnet_chisa.pcapng)
 
+12. Alice mencurigai Knights menjalankan beberapa layanan rahasia di node-nya. Lakukan pemindaian port dari node Alice ke node Knights menggunakan Netcat (nc) untuk memeriksa port 22 (SSH) dan 80 (HTTP) dalam keadaan terbuka, serta port rahasia 7777 dalam keadaan tertutup. Analisis di Wireshark perbedaan TCP Flag yang dikembalikan antara port terbuka (SYN-ACK) dengan port tertutup (RST-ACK).
+
+Jalankan layanan SSS dan HTTP pada Knights:
+
+```bash
+apk update
+apk add openssh
+ssh-keygen -A
+
+id mika_admin >/dev/null 2>&1 || adduser -D mika_admin
+echo "mika_admin:mika123" | chpasswd
+
+sed -i \
+    -e 's/^#*PubkeyAuthentication.*/PubkeyAuthentication yes/' \
+    -e 's/^#*PasswordAuthentication.*/PasswordAuthentication yes/' \
+    /etc/ssh/sshd_config
+
+grep -q '^PubkeyAuthentication ' /etc/ssh/sshd_config ||
+    echo "PubkeyAuthentication yes" >> /etc/ssh/sshd_config
+
+grep -q '^PasswordAuthentication ' /etc/ssh/sshd_config ||
+    echo "PasswordAuthentication yes" >> /etc/ssh/sshd_config
+
+pkill sshd 2>/dev/null || true
+/usr/sbin/sshd
+
+
+# http (port 80)
+mkdir -p /www
+echo "Knights HTTP Server" > /www/index.html
+httpd -p 80 -h /www
+```
+
+![knights listening ports](assets/knights-listening-ports.png)
+
+Selanjutnya dilakukan pemeriksaan ketiga port dari Alice menggunakan Netcat, bersamaan dengan capture traffic menuju Knights.
+
+```bash
+nc -zv 10.64.3.2 22 80 7777
+```
+
+![alice nc knights](assets/alice-nc-knights.png)
+
+filter wireshark
+
+```wireshark
+tcp.port == 22 || tcp.port == 80 || tcp.port == 7777
+```
+
+![knights port flags](assets/knights-open-closed-port-flags.png)
+
+Port terbuka membalas permintaan SYN dengan SYN-ACK untuk memulai pembentukan koneksi TCP. Port tertutup umumnya membalas dengan RST-ACK sebagai penolakan koneksi. Jika paket dibuang oleh firewall tanpa balasan, hasilnya dapat berupa timeout dan bukan bukti respons RST-ACK.
+
+file capture: [`alice-nc-knights.pcapng`](captures/alice_nc_knights.pcapng)
+
 14. Pada soal ini kita diminta untuk melakukan analisis file capture `wired_bruteforce.pcapng` untuk mengidentifikasi alamat IP penyerang, target IP beserta port yang diserang, password user `lain_admin`, serta web server software dan versinya.
 
 *Langkah Penyelesaian*
