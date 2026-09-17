@@ -466,6 +466,49 @@ put mika_upload_test.txt
 
 ![mika ftp readonly](assets/mika-ftp-readonly.png)
 
+10. Knights melancarkan uji ketahanan koneksi ke server Chisa untuk menguji latensi jaringan The Wired. Kirimkan paket ping dari node Knights ke node Chisa dengan payload khusus 128 bytes dan interval 0.3 detik sebanyak 77 paket. Buka Wireshark, catat nilai ICMP Type dan Code untuk Echo Request vs Echo Reply, serta analisis packet loss dan RTT (min/avg/max).
+
+Pengujian dilakukan dari Knights menuju Chisa menggunakan perintah berikut:
+
+```bash
+ping -c 77 -s 128 -i 0.3 10.64.2.2
+```
+
+- `-c 77`: mengirimkan 77 paket Echo Request.
+- `-s 128`: menggunakan payload ICMP sebesar 128 bytes.
+- `-i 0.3`: memberikan interval 0,3 detik antarpengiriman.
+
+![knights ping chisa](assets/knights-ping-chisa.gif)
+
+Pada saat pengujian berlangsung, capture dijalankan untuk mengamati paket ICMP. Filter yang digunakan adalah sebagai berikut:
+
+```wireshark
+icmp.type == 8 || icmp.type == 0
+```
+![icmp echo request](assets/icmp-echo-request.png)
+
+![icmp echo reply](assets/icmp-echo-reply.png)
+
+Ringkasan hasil pengujian adalah sebagai berikut:
+
+| Parameter                 | Hasil    |
+| ------------------------- | -------- |
+| Paket dikirim             | 77 paket |
+| Paket diterima            | 77 paket |
+| Packet loss               | 0%       |
+| RTT minimum               | 0.332 ms |
+| RTT rata-rata             | 0.603 ms |
+| RTT maksimum              | 1.241 ms |
+| Echo Request: Type / Code | 8 / 0    |
+| Echo Reply: Type / Code   | 0 / 0    |
+
+RTT menunjukkan waktu perjalanan paket menuju tujuan dan kembali ke pengirim. Ukuran frame pada Wireshark lebih besar dari payload 128 bytes karena mencakup header protokol.
+
+Berdasarkan hasil tersebut, kondisi koneksi Knights ke Chisa tergolong stabil. Seluruh 77 paket yang dikirim berhasil diterima kembali tanpa packet loss. Nilai RTT minimum sebesar 0.332 ms, rata-rata 0.603 ms, dan maksimum 1.241 ms menunjukkan bahwa komunikasi antar-node berlangsung dengan cepat dan memiliki latensi yang rendah.
+
+
+file capture : [`knights_icmp_chisa.pcapng`](captures/knights_icmp_chisa.pcapng)
+
 14. Pada soal ini kita diminta untuk melakukan analisis file capture `wired_bruteforce.pcapng` untuk mengidentifikasi alamat IP penyerang, target IP beserta port yang diserang, password user `lain_admin`, serta web server software dan versinya.
 
 *Langkah Penyelesaian*
