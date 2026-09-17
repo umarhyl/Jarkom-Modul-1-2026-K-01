@@ -287,6 +287,8 @@ iptables -A FORWARD -i eth3 -o eth0 -j ACCEPT
 
 6. Mika mencurigai adanya anomali traffic pada segmen jaringannya. Jalankan generator traffic berikut ([link file](https://drive.google.com/drive/folders/1ZjFvWIjvAQAjE9pPthm7V_bGyaSt93lY?usp=sharing)) pada node Mika, lalu lakukan packet sniffing menggunakan Wireshark pada interface node Mika. Terapkan display filter khusus untuk menyaring paket yang berprotokol DNS atau ICMP. Tunjukkan screenshot hasil filter beserta ringkasan paket yang lolos.
 
+File [`traffic_protocol7.sh`](artefacts/traffic_protocol7.sh) dijalankan pada Mika untuk menghasilkan traffic DNS dan ICMP. Berikut isi script tersebut.
+
 ```bash
 #!/bin/bash
 # ============================================
@@ -337,7 +339,7 @@ Ringkasan paket yang lolos filter adalah sebagai berikut:
 | DNS      | **22 packet** | Mika ↔ `8.8.8.8`, Mika ↔ `1.1.1.1`                        | Query/response `its.ac.id`, `example.com`, `github.com`, `cloudflare.com`, dan `google.com`. Record yang terlihat meliputi **A** dan **AAAA**. |
 | ICMP     |          **26 paket** | Mika ↔ `8.8.8.8`, Mika ↔ `1.1.1.1`, Mika ↔ `103.94.189.4` | ICMP **Echo Request (Type 8, Code 0)** dan **Echo Reply (Type 0, Code 0)** dengan pola request–reply.                                          |
 
-file capture: [`mika-capture-icmp-dns.pcapng`](assets/mika-capture.pcapng).
+file capture: [`mika-capture-icmp-dns.pcapng`](./captures/capture_mika_icmp_dns.pcapng).
 
 7. Chisa memutuskan mendirikan FTP Server pada node miliknya dengan shared folder di /var/wired/data. Terapkan kebijakan akses: user alice (hak akses read & write), user mika (dibatasi read-only), dan user eiri (dibatasi tanpa izin akses / blacklist). Buktikan konfigurasi dengan membuat file signal_alice.txt dari user alice, dan buktikan penolakan akses saat user eiri mencoba login.
 
@@ -412,6 +414,35 @@ ls
 Berikutnya dilakukan percobaan login menggunakan akun **eiri**.
 
 ![ftp eiri denied](assets/ftp-eiri-denied.png)
+
+8. Kelompok rahasia Knights perlu mengirimkan dokumen laporan intelijen ke FTP Server Chisa. Lakukan koneksi FTP client dari node Knights ke FTP Server Chisa menggunakan akun alice. Upload file berikut ([link file](https://drive.google.com/drive/folders/1tvZpueSH9E3GWwXM6KNnM64Y5wNoIAYP?usp=sharing)). Analisis sesi Wireshark dan sebutkan: perintah FTP untuk upload (STOR), kode status sukses server (226), dan port data TCP yang dinegosiasikan pada mode PASV.
+
+File [`knights_report.txt](artefacts/knights_report.txt). Selanjutnya dilakukan koneksi ke FTP server Chisa menggunakan akun alice dan mode PASV. Capture dimulai sebelum koneksi FTP dilakukan agar proses negosiasi port ikut terekam.
+
+```bash
+lftp -u alice,alice123 ftp://10.64.2.2
+set ftp:passive-mode true
+```
+
+![knights ftp upload](assets/knights-ftp-upload.gif)
+
+Pada Wireshark, FTP diperiksa untuk menemukan perintah `PASV`, respons `227`, perintah `STOR`, serta respons `226` yang berkaitan dengan transfer dokumen.
+
+![knights ftp pasv](assets/knights-ftp-pasv.png)
+
+`STOR` merupakan perintah untuk menyimpan file pada server. Respons `226` menunjukkan penyelesaian transfer. Pada mode PASV, port data dihitung dari dua angka terakhir respons `227` dengan rumus `(p1 * 256) + p2`.
+
+| Informasi | Hasil capture |
+| --- | --- |
+| Perintah upload dan nama file | STOR knights_report.txt |
+| Respons penyelesaian transfer | 226 Transfer complete. |
+| Respons PASV | 227 Entering Passive Mode (10,64,2,2,117,131). |
+| Perhitungan port data | (117 × 256) + 131 = 30083 |
+| IP:port client dan IP:port server pada kanal data | 10.64.3.2:50926 → 10.64.2.2:30083 |
+
+![knights ftp data port](assets/knights-ftp-data-port.png)
+
+file capture: [`knights-ftp-upload.pcapng`](./captures/knights_ftp_upload.pcapng)
 
 14. Pada soal ini kita diminta untuk melakukan analisis file capture `wired_bruteforce.pcapng` untuk mengidentifikasi alamat IP penyerang, target IP beserta port yang diserang, password user `lain_admin`, serta web server software dan versinya.
 
