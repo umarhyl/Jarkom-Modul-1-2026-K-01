@@ -713,3 +713,24 @@ Karena kita sudah tau isinya ada `MailClientID` maka kita akan mengfilter packet
 Selanjutnya kita klik kanan dan **follow TCP Stream**, disitu kita dapat melihat Email penyerang dan korban yang ditargetkan, pesan dr penyerang dan ancaman oleh penyerang.
 
 ![Validasi_Soal-19](assets/Validasi_Soal-19.png)
+
+20. Mengidentifikasi versi protokol TLS yang dinegosiasikan, nama domain (SNI) yang diakses, alamat IP server HTTPS penyerang, User-Agent yang digunakan, serta HTTP request method dan path yang tersembunyi di dalam sesi dekripsi pada file capture `wired_tls_decrypt.pcapng` bersama `keyslogfile.txt`.
+
+Langkah Penyelesaian
+
+Pertama-tama kita akan mencari **Client Hello** atau bisa dengan filter `tls.handshake.type == 1` dan dibagian **Destinations** terdapat IP server penyerang dan TLS protocol apa. Selanjutnya, untuk mencari SNI, klik dua kali pada packet **Client Hello** lalu ke panel detail **Handshake Protocol : Client Hello -> Extensions : Server_name -> Server Name Indication Extention**. Akan terdapat nama domai (SNI).
+
+![TampakAwal](assets/TampakAwal.png)
+
+Kami diberi keylogs untuk melihat `User-Agent`, HTTP request method dan path yang tersembunyi. Klik menu **Edit**, lalu pilih **Preferences**. Klik dropdown pada **Protocols**, lalu cari dan pencet **TSL**. Cari kolom yang bernama **(Pre)-Master-Secret log filename** lalu browse file keylogs yang sudah dikasih, pencet **OK**. 
+
+![TSL](assets/TSL.png)
+
+Maka tampilan akan berbeda dan akan langsung terlihat `User-Agent`, method, dan path pada panel bawah.
+
+![TampakAkhir](assets/TampakAkhir.png)
+
+*Berikut adalah validasi temuan kami:*
+
+![Validasi_Soal-20](assets/Validasi_Soal-20.png)
+
