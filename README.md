@@ -478,7 +478,7 @@ ping -c 77 -s 128 -i 0.3 10.64.2.2
 - `-s 128`: menggunakan payload ICMP sebesar 128 bytes.
 - `-i 0.3`: memberikan interval 0,3 detik antarpengiriman.
 
-![knights ping chisa](assets/knights-ping-chisa.gif)
+![knights ping chisa](assets/knights-ping-chisa.png)
 
 Pada saat pengujian berlangsung, capture dijalankan untuk mengamati paket ICMP. Filter yang digunakan adalah sebagai berikut:
 
