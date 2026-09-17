@@ -639,7 +639,7 @@ Selanjutnya, kita bisa klik kanan dan **follow TCP stream**, disini kita akan te
 
 *Langkah Penyelesaian*
 
-Dimulai dengan mengfilter packet dengan `http.request.method=="GET"` karena command “GET” biasanya digunakan untuk meminta, menarik, atau mengambil data dari sebuah server. Setelah itu, kita akan mencari packet yang mencurigakan di kolom infonya. Disini kita akan melihat file `.exe` yang berbeda dengan permintaan `style.css` dan HTTP, maka file `.exe` tersebut mencurigakan. Disini kita lihat di kolom **Destinations** pada Packet tersebut bahwa itu adalah alamat IP penyerang.
+Dimulai dengan mengfilter packet dengan `http.request.method=="GET"` karena command “GET” biasanya digunakan untuk meminta, menarik, atau mengambil data dari sebuah server. Setelah itu, kita akan mencari packet yang mencurigakan di kolom infonya. Disini kita akan melihat file `.exe` yang berbeda dengan permintaan `style.css`, maka file `.exe` tersebut mencurigakan. Disini kita lihat di kolom **Destinations** pada Packet tersebut bahwa itu adalah alamat IP penyerang.
 
 ![GET](assets/GET.png)
 
