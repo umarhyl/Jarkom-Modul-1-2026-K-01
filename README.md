@@ -634,3 +634,16 @@ Kita menemukan Packet dengan info `220 Welcome to Wired FTP Server (vsftpd 3.0.5
 Selanjutnya, kita bisa klik kanan dan **follow TCP stream**, disini kita akan terjawab kredensial login penyerang, serta ukuran (size in bytes) dari file malware.
 
 ![Validasi Pocket & Follow TCP Stream](assets/Validasi_Soal-16.png)
+
+17. Menganalisis file capture `wired_http_c2.pcap` untuk mengidentifikasi nama domain (Host) tempat malware diunduh, alamat IP server penyerang, nama file executable malware yang diunduh, serta kode status HTTP yang dikembalikan.
+
+*Langkah Penyelesaian*
+
+Dimulai dengan mengfilter packet dengan `http.request.method=="GET"` karena command “GET” biasanya digunakan untuk meminta, menarik, atau mengambil data dari sebuah server. Setelah itu, kita akan mencari packet yang mencurigakan di kolom infonya. Disini kita akan melihat file `.exe` yang berbeda dengan permintaan `style.css` dan HTTP, maka file `.exe` tersebut mencurigakan. Disini kita lihat di kolom **Destinations** pada Packet tersebut bahwa itu adalah alamat IP penyerang.
+
+![GET](assets/GET.png)
+
+Lalu dilanjutkan dengan mengklik kanan dan **follow HTTP stream** pada packet tersebut yang akan menunjukan nama domain Host, nama filename `.exe`, dan kode status HTTP tersebut.
+
+![Validasi_Soal-17](assets/Validasi_Soal-17.png)
+
