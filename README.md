@@ -9,7 +9,7 @@
 
 ## Laporan
 
-1. Untuk mempersiapkan pembangunan The Wired, Lain yang berperan sebagai Router membuat tiga Switch/Gateway: Switch 1 menuju dua Entitas yaitu Alice dan Mika, Switch 2 menuju Chisa, sedangkan Switch 3 menuju Knights dan Eiri. Kelima Entitas tersebut dikonfigurasi sebagai Client di GNS3.
+### 1. Untuk mempersiapkan pembangunan The Wired, Lain yang berperan sebagai Router membuat tiga Switch/Gateway: Switch 1 menuju dua Entitas yaitu Alice dan Mika, Switch 2 menuju Chisa, sedangkan Switch 3 menuju Knights dan Eiri. Kelima Entitas tersebut dikonfigurasi sebagai Client di GNS3.
 
 Pertama, dibuat topologi jaringan sesuai dengan pembagian node pada soal. Lain menjadi router yang menghubungkan ketiga segmen jaringan, sedangkan kelima entitas menjadi client pada switch masing-masing.
 
@@ -33,7 +33,7 @@ Prefix IP kelompok kami adalah `10.64.X.X`. Pembagian subnet dan gateway yang di
 | Switch 3 | Knights, Eiri | 10.64.3.0/24 | 10.64.3.1 |
 
 
-2. Karena menurut Lain pada saat itu The Wired masih terisolasi dari dunia luar, konfigurasikan router Lain agar dapat tersambung langsung ke jaringan internet publik melalui NAT/DHCP pada interface eth0.
+### 2. Karena menurut Lain pada saat itu The Wired masih terisolasi dari dunia luar, konfigurasikan router Lain agar dapat tersambung langsung ke jaringan internet publik melalui NAT/DHCP pada interface eth0.
 
 Untuk membuat Lain terhubung ke internet, interface **eth0** yang terhubung dengan NAT dikonfigurasi agar memperoleh alamat IP melalui DHCP. Konfigurasi yang digunakan pada file `/etc/network/interfaces` adalah sebagai berikut:
 
@@ -50,7 +50,7 @@ Selanjutnya dilakukan pengujian koneksi dari Lain ke `8.8.8.8` untuk memastikan 
 
 ![lain internet](assets/lain-internet.png)
 
-3. Setelah router Lain terhubung ke internet, pastikan seluruh Entitas (Client) di bawah Switch 1, Switch 2, dan Switch 3 dapat saling terhubung dan berkomunikasi satu sama lain melalui konfigurasi routing.
+### 3. Setelah router Lain terhubung ke internet, pastikan seluruh Entitas (Client) di bawah Switch 1, Switch 2, dan Switch 3 dapat saling terhubung dan berkomunikasi satu sama lain melalui konfigurasi routing.
 
 Agar seluruh client dapat berkomunikasi, setiap interface LAN pada Lain diberikan alamat IP statis yang menjadi gateway bagi subnet terkait. Konfigurasi interface LAN Lain adalah sebagai berikut:
 
@@ -144,7 +144,7 @@ Ketiga subnet LAN merupakan jaringan yang terhubung langsung ke Lain, sehingga r
 
 ![ping others](assets/ping-others.png)
 
-4. Lain ingin agar setiap Entitas (Client) memiliki kemandirian di The Wired. Konfigurasikan firewall/iptables (NAT Masquerade) dan DNS resolver agar setiap Client dapat terhubung ke internet secara mandiri (dapat melakukan ping ke 192.168.122.1 dan membuka domain web google.com).
+### 4. Lain ingin agar setiap Entitas (Client) memiliki kemandirian di The Wired. Konfigurasikan firewall/iptables (NAT Masquerade) dan DNS resolver agar setiap Client dapat terhubung ke internet secara mandiri (dapat melakukan ping ke 192.168.122.1 dan membuka domain web google.com).
 
 Untuk memberikan akses internet kepada seluruh client, dilakukan konfigurasi NAT Masquerade pada Lain. Aturan ini mengganti alamat sumber paket dari jaringan client dengan alamat interface keluar Lain, yaitu **eth0**.
 
@@ -165,7 +165,7 @@ up echo "nameserver 192.168.122.1" > /etc/resolv.conf
 
 ![client dns internet](assets/client-dns-internet.png)
 
-5. Eiri tetap berupaya menanamkan kekacauan ke dalam jaringan. Untuk mengantisipasi restart tiba-tiba, pastikan seluruh konfigurasi jaringan tidak hilang saat semua node di-restart. Buat script verifikasi di /root/cek_status.sh pada router Lain yang menampilkan ringkasan interface (ip -br a) dan status tabel NAT (iptables -t nat -L -v -n) setelah reboot.
+### 5. Eiri tetap berupaya menanamkan kekacauan ke dalam jaringan. Untuk mengantisipasi restart tiba-tiba, pastikan seluruh konfigurasi jaringan tidak hilang saat semua node di-restart. Buat script verifikasi di /root/cek_status.sh pada router Lain yang menampilkan ringkasan interface (ip -br a) dan status tabel NAT (iptables -t nat -L -v -n) setelah reboot.
 
 Agar konfigurasi tetap berlaku setelah restart, pengaturan interface, route, DNS, IP forwarding, dan aturan iptables disimpan melalui mekanisme startup yang digunakan pada node.
 
@@ -285,7 +285,7 @@ iptables -A FORWARD -i eth3 -o eth0 -j ACCEPT
 
 ![lain after restart](assets/lain-after-restart.png)
 
-6. Mika mencurigai adanya anomali traffic pada segmen jaringannya. Jalankan generator traffic berikut ([link file](https://drive.google.com/drive/folders/1ZjFvWIjvAQAjE9pPthm7V_bGyaSt93lY?usp=sharing)) pada node Mika, lalu lakukan packet sniffing menggunakan Wireshark pada interface node Mika. Terapkan display filter khusus untuk menyaring paket yang berprotokol DNS atau ICMP. Tunjukkan screenshot hasil filter beserta ringkasan paket yang lolos.
+### 6. Mika mencurigai adanya anomali traffic pada segmen jaringannya. Jalankan generator traffic berikut ([link file](https://drive.google.com/drive/folders/1ZjFvWIjvAQAjE9pPthm7V_bGyaSt93lY?usp=sharing)) pada node Mika, lalu lakukan packet sniffing menggunakan Wireshark pada interface node Mika. Terapkan display filter khusus untuk menyaring paket yang berprotokol DNS atau ICMP. Tunjukkan screenshot hasil filter beserta ringkasan paket yang lolos.
 
 File [`traffic_protocol7.sh`](artefacts/traffic_protocol7.sh) dijalankan pada Mika untuk menghasilkan traffic DNS dan ICMP. Berikut isi script tersebut.
 
@@ -341,7 +341,7 @@ Ringkasan paket yang lolos filter adalah sebagai berikut:
 
 file capture: [`mika-capture-icmp-dns.pcapng`](./captures/capture_mika_icmp_dns.pcapng).
 
-7. Chisa memutuskan mendirikan FTP Server pada node miliknya dengan shared folder di /var/wired/data. Terapkan kebijakan akses: user alice (hak akses read & write), user mika (dibatasi read-only), dan user eiri (dibatasi tanpa izin akses / blacklist). Buktikan konfigurasi dengan membuat file signal_alice.txt dari user alice, dan buktikan penolakan akses saat user eiri mencoba login.
+### 7. Chisa memutuskan mendirikan FTP Server pada node miliknya dengan shared folder di /var/wired/data. Terapkan kebijakan akses: user alice (hak akses read & write), user mika (dibatasi read-only), dan user eiri (dibatasi tanpa izin akses / blacklist). Buktikan konfigurasi dengan membuat file signal_alice.txt dari user alice, dan buktikan penolakan akses saat user eiri mencoba login.
 
 Pertama dilakukan instalasi FTP server pada Chisa menggunakan `vsftpd`. Kemudian dibuat direktori `/var/wired/data` sebagai shared folder dan akun yang diperlukan untuk pengujian.
 
@@ -415,7 +415,7 @@ Berikutnya dilakukan percobaan login menggunakan akun **eiri**.
 
 ![ftp eiri denied](assets/ftp-eiri-denied.png)
 
-8. Kelompok rahasia Knights perlu mengirimkan dokumen laporan intelijen ke FTP Server Chisa. Lakukan koneksi FTP client dari node Knights ke FTP Server Chisa menggunakan akun alice. Upload file berikut ([link file](https://drive.google.com/drive/folders/1tvZpueSH9E3GWwXM6KNnM64Y5wNoIAYP?usp=sharing)). Analisis sesi Wireshark dan sebutkan: perintah FTP untuk upload (STOR), kode status sukses server (226), dan port data TCP yang dinegosiasikan pada mode PASV.
+### 8. Kelompok rahasia Knights perlu mengirimkan dokumen laporan intelijen ke FTP Server Chisa. Lakukan koneksi FTP client dari node Knights ke FTP Server Chisa menggunakan akun alice. Upload file berikut ([link file](https://drive.google.com/drive/folders/1tvZpueSH9E3GWwXM6KNnM64Y5wNoIAYP?usp=sharing)). Analisis sesi Wireshark dan sebutkan: perintah FTP untuk upload (STOR), kode status sukses server (226), dan port data TCP yang dinegosiasikan pada mode PASV.
 
 File [`knights_report.txt](artefacts/knights_report.txt). Selanjutnya dilakukan koneksi ke FTP server Chisa menggunakan akun alice dan mode PASV.
 
@@ -444,7 +444,7 @@ Pada Wireshark, FTP diperiksa untuk menemukan perintah `PASV`, respons `227`, pe
 
 file capture: [`knights-ftp-upload.pcapng`](./captures/knights_ftp_upload.pcapng)
 
-9. Mika mengakses dokumen Protokol Tujuh di ([link file](https://drive.google.com/drive/folders/1S3hG0dnZBTkCta4uILWwKVc6dSYYGRJ6?usp=sharing)) dari FTP Server Chisa. Dari node Mika, unduh file tersebut menggunakan akun mika. Setelah itu, buktikan pembatasan read-only dengan mencoba mengunggah file baru dari akun mika, dan tunjukkan pesan error respon server (error 550 Permission denied) saat mika mencoba melakukan upload.
+### 9. Mika mengakses dokumen Protokol Tujuh di ([link file](https://drive.google.com/drive/folders/1S3hG0dnZBTkCta4uILWwKVc6dSYYGRJ6?usp=sharing)) dari FTP Server Chisa. Dari node Mika, unduh file tersebut menggunakan akun mika. Setelah itu, buktikan pembatasan read-only dengan mencoba mengunggah file baru dari akun mika, dan tunjukkan pesan error respon server (error 550 Permission denied) saat mika mencoba melakukan upload.
 
 File [`protocol7_manifesto.txt`](artefacts/protocol7_manifesto.txt) ditaruh pada direktori `/var/wired/data` di node Chisa. 
 
@@ -466,7 +466,7 @@ put mika_upload_test.txt
 
 ![mika ftp readonly](assets/mika-ftp-readonly.png)
 
-10. Knights melancarkan uji ketahanan koneksi ke server Chisa untuk menguji latensi jaringan The Wired. Kirimkan paket ping dari node Knights ke node Chisa dengan payload khusus 128 bytes dan interval 0.3 detik sebanyak 77 paket. Buka Wireshark, catat nilai ICMP Type dan Code untuk Echo Request vs Echo Reply, serta analisis packet loss dan RTT (min/avg/max).
+### 10. Knights melancarkan uji ketahanan koneksi ke server Chisa untuk menguji latensi jaringan The Wired. Kirimkan paket ping dari node Knights ke node Chisa dengan payload khusus 128 bytes dan interval 0.3 detik sebanyak 77 paket. Buka Wireshark, catat nilai ICMP Type dan Code untuk Echo Request vs Echo Reply, serta analisis packet loss dan RTT (min/avg/max).
 
 Pengujian dilakukan dari Knights menuju Chisa menggunakan perintah berikut:
 
@@ -508,7 +508,7 @@ Berdasarkan hasil tersebut, kondisi koneksi Knights ke Chisa tergolong stabil. S
 
 file capture : [`knights_icmp_chisa.pcapng`](captures/knights_icmp_chisa.pcapng)
 
-11. Buktikan kelemahan protokol Telnet dengan membuat akun phantom_user dan password wired_ghost pada layanan telnetd di node Chisa. Lakukan login Telnet dari node Eiri ke node Chisa dan tangkap sesi menggunakan Wireshark. Tunjukkan kredensial plain text melalui fitur Follow TCP Stream, serta jelaskan mengapa setiap karakter terkirim dalam paket TCP terpisah.
+### 11. Buktikan kelemahan protokol Telnet dengan membuat akun phantom_user dan password wired_ghost pada layanan telnetd di node Chisa. Lakukan login Telnet dari node Eiri ke node Chisa dan tangkap sesi menggunakan Wireshark. Tunjukkan kredensial plain text melalui fitur Follow TCP Stream, serta jelaskan mengapa setiap karakter terkirim dalam paket TCP terpisah.
 
 Secara default, telnetd udah ada di alpine, jadi hanya perlu akun `phantom_user` dengan password praktikum `wired_ghost`.
 
@@ -533,7 +533,7 @@ Telnet tidak mengenkripsi sesi sehingga data autentikasi dapat dibaca dari hasil
 
 file capture: [`eiri-telnet-chisa.pcapng`](captures/eiri_telnet_chisa.pcapng)
 
-12. Alice mencurigai Knights menjalankan beberapa layanan rahasia di node-nya. Lakukan pemindaian port dari node Alice ke node Knights menggunakan Netcat (nc) untuk memeriksa port 22 (SSH) dan 80 (HTTP) dalam keadaan terbuka, serta port rahasia 7777 dalam keadaan tertutup. Analisis di Wireshark perbedaan TCP Flag yang dikembalikan antara port terbuka (SYN-ACK) dengan port tertutup (RST-ACK).
+### 12. Alice mencurigai Knights menjalankan beberapa layanan rahasia di node-nya. Lakukan pemindaian port dari node Alice ke node Knights menggunakan Netcat (nc) untuk memeriksa port 22 (SSH) dan 80 (HTTP) dalam keadaan terbuka, serta port rahasia 7777 dalam keadaan tertutup. Analisis di Wireshark perbedaan TCP Flag yang dikembalikan antara port terbuka (SYN-ACK) dengan port tertutup (RST-ACK).
 
 Jalankan layanan SSS dan HTTP pada Knights:
 
@@ -588,7 +588,7 @@ Port terbuka membalas permintaan SYN dengan SYN-ACK untuk memulai pembentukan ko
 
 file capture: [`alice-nc-knights.pcapng`](captures/alice_nc_knights.pcapng)
 
-13. Lain memerintahkan agar administrasi jarak jauh menggunakan SSH secara aman tanpa password. Install OpenSSH server pada node Knights, buat pasangan kunci SSH (ssh-keygen) pada node Mika untuk user mika_admin, dan konfigurasikan public key authentication (PasswordAuthentication no). Lakukan koneksi SSH dari node Mika ke node Knights, tangkap sesi menggunakan Wireshark, identifikasi paket Protocol Version Exchange dan Key Exchange, serta jelaskan mengapa kredensial tidak terlihat dalam bentuk teks terbuka seperti pada Telnet.
+### 13. Lain memerintahkan agar administrasi jarak jauh menggunakan SSH secara aman tanpa password. Install OpenSSH server pada node Knights, buat pasangan kunci SSH (ssh-keygen) pada node Mika untuk user mika_admin, dan konfigurasikan public key authentication (PasswordAuthentication no). Lakukan koneksi SSH dari node Mika ke node Knights, tangkap sesi menggunakan Wireshark, identifikasi paket Protocol Version Exchange dan Key Exchange, serta jelaskan mengapa kredensial tidak terlihat dalam bentuk teks terbuka seperti pada Telnet.
 
 Konfigurasi menggunakan script [`mika.sh`](nodes/mika/mika.sh) dan [`knights.sh`](nodes/knights/knights.sh). Copy public key dari Mika ke Knights menggunakan `ssh-copy-id` atau metode lain, lalu ubah konfigurasi SSH server pada Knights untuk menonaktifkan autentikasi password. Setelah public key Mika dipasang pada Knights dan `PasswordAuthentication no` diterapkan, pengujian dilakukan sebagai berikut.
 
@@ -628,7 +628,7 @@ SSH mengenkripsi data autentikasi dan isi sesi setelah pertukaran kunci, sehingg
 
 File capture: [`ssh_mika_knigths.pcapng`](captures/ssh_mika_knigths.pcapng).
 
-14. Pada soal ini kita diminta untuk melakukan analisis file capture `wired_bruteforce.pcapng` untuk mengidentifikasi alamat IP penyerang, target IP beserta port yang diserang, password user `lain_admin`, serta web server software dan versinya.
+### 14. Pada soal ini kita diminta untuk melakukan analisis file capture `wired_bruteforce.pcapng` untuk mengidentifikasi alamat IP penyerang, target IP beserta port yang diserang, password user `lain_admin`, serta web server software dan versinya.
 
 *Langkah Penyelesaian*
 
@@ -640,7 +640,7 @@ Selanjutnya, untuk mencari password user `lain_admin`, web server software dan v
 
 ![Validasi_Soal-14](assets/Validasi_Soal-14.png)
 
-15. Pada soal ini kita diminta untuk melakukan analisis file capture `wired_usb_hid.pcap` untuk mengidentifikasi Vendor ID dan Product ID perangkat USB dari deskriptor USB, alamat nomor device USB, serta pesan rahasia yang berhasil dicuri dari keystroke.
+### 15. Pada soal ini kita diminta untuk melakukan analisis file capture `wired_usb_hid.pcap` untuk mengidentifikasi Vendor ID dan Product ID perangkat USB dari deskriptor USB, alamat nomor device USB, serta pesan rahasia yang berhasil dicuri dari keystroke.
 
 *Langkah Penyelesaian*
 
@@ -657,12 +657,14 @@ Untuk mendapatkan pesan rahasia, dilakukan filter dengan `usb.capdata`. Disini k
 ![LeftoverCaptureData](assets/Secret_code.png).
 
 *Berikut adalah bagaimana kami menerjemahkan Byte nya:*
+
 ![Byte Code](assets/Byte_code.jpeg)
 
 *Berikut adalah validasi temuan kami:*
+
 ![Validasi_Soal-14](assets/Validasi_Soal-15.png)
 
-16. Pada soal ini kita diminta untuk melakukan analisis lalu lintas FTP untuk mengidentifikasi alamat IP server FTP penyerang, banner software FTP yang digunakan, kredensial login penyerang, serta ukuran (size in bytes) dari file malware knights_payload.exe yang diunduh.
+### 16. Pada soal ini kita diminta untuk melakukan analisis lalu lintas FTP untuk mengidentifikasi alamat IP server FTP penyerang, banner software FTP yang digunakan, kredensial login penyerang, serta ukuran (size in bytes) dari file malware knights_payload.exe yang diunduh.
 
 *Langkah Penyelesaian*
 
@@ -675,7 +677,7 @@ Selanjutnya, kita bisa klik kanan dan **follow TCP stream**, disini kita akan te
 
 ![Validasi Pocket & Follow TCP Stream](assets/Validasi_Soal-16.png)
 
-17. Menganalisis file capture `wired_http_c2.pcap` untuk mengidentifikasi nama domain (Host) tempat malware diunduh, alamat IP server penyerang, nama file executable malware yang diunduh, serta kode status HTTP yang dikembalikan.
+### 17. Menganalisis file capture `wired_http_c2.pcap` untuk mengidentifikasi nama domain (Host) tempat malware diunduh, alamat IP server penyerang, nama file executable malware yang diunduh, serta kode status HTTP yang dikembalikan.
 
 *Langkah Penyelesaian*
 
@@ -687,7 +689,7 @@ Lalu dilanjutkan dengan mengklik kanan dan **follow HTTP stream** pada packet te
 
 ![Validasi_Soal-17](assets/Validasi_Soal-17.png)
 
-18. Menganalisis file capture `wired_smb_transfer.pcapng` untuk mengidentifikasi nama protokol jaringan yang dieksploitasi, IP pengirim dan penerima, folder tujuan penyimpanan malware pada sistem korban, serta nama file executable malware yang ditransfer.
+### 18. Menganalisis file capture `wired_smb_transfer.pcapng` untuk mengidentifikasi nama protokol jaringan yang dieksploitasi, IP pengirim dan penerima, folder tujuan penyimpanan malware pada sistem korban, serta nama file executable malware yang ditransfer.
 
 *Langkah Penyelesaian*
 
@@ -702,7 +704,7 @@ Di dalam tersebut terlihat Filename: `System32\wired_trojan_payload.exe`. `Syste
 ![Validasi_Soal-18](assets/Validasi_Soal-18.png)
 
 
-19. Menganalisis file capture `wired_smtp_threat.pcap` pada stream TCP terkait, identifikasi alamat email korban yang ditargetkan, password korban yang diklaim bocor oleh penyerang, jenis malware yang diinfeksikan, batas waktu (dalam hari) yang diberikan, serta `MailClientID` yang tercantum pada pesan.
+### 19. Menganalisis file capture `wired_smtp_threat.pcap` pada stream TCP terkait, identifikasi alamat email korban yang ditargetkan, password korban yang diklaim bocor oleh penyerang, jenis malware yang diinfeksikan, batas waktu (dalam hari) yang diberikan, serta `MailClientID` yang tercantum pada pesan.
 
 *Langkah Penyelesaian*
 
@@ -714,7 +716,7 @@ Selanjutnya kita klik kanan dan **follow TCP Stream**, disitu kita dapat melihat
 
 ![Validasi_Soal-19](assets/Validasi_Soal-19.png)
 
-20. Mengidentifikasi versi protokol TLS yang dinegosiasikan, nama domain (SNI) yang diakses, alamat IP server HTTPS penyerang, User-Agent yang digunakan, serta HTTP request method dan path yang tersembunyi di dalam sesi dekripsi pada file capture `wired_tls_decrypt.pcapng` bersama `keyslogfile.txt`.
+### 20. Mengidentifikasi versi protokol TLS yang dinegosiasikan, nama domain (SNI) yang diakses, alamat IP server HTTPS penyerang, User-Agent yang digunakan, serta HTTP request method dan path yang tersembunyi di dalam sesi dekripsi pada file capture `wired_tls_decrypt.pcapng` bersama `keyslogfile.txt`.
 
 *Langkah Penyelesaian*
 
@@ -733,4 +735,3 @@ Maka tampilan akan berbeda dan akan langsung terlihat `User-Agent`, method, dan 
 *Berikut adalah validasi temuan kami:*
 
 ![Validasi_Soal-20](assets/Validasi_Soal-20.png)
-
